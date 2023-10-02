@@ -4,6 +4,7 @@ import 'package:pos_flutter/config/style/style.dart';
 ThemeData myTheme() {
   return ThemeData(
       colorScheme: colorSceme(),
+      scaffoldBackgroundColor: Colors.grey.shade100,
       appBarTheme: appBarTheme(),
       inputDecorationTheme: inputDecorationTheme(),
       iconButtonTheme: iconButtonThemeData(),
@@ -43,8 +44,12 @@ FloatingActionButtonThemeData floatingActionButtonThemeData() {
 
 InputDecorationTheme inputDecorationTheme() {
   return InputDecorationTheme(
+      contentPadding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 12),
+      errorStyle: textTheme().bodySmall?.copyWith(color: errorColor),
       errorBorder: errorBorder,
       focusedBorder: focusedBorder,
+      labelStyle: textSmall,
+      hintStyle: textSmall,
       border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(color: Colors.grey.shade200, width: 1)));

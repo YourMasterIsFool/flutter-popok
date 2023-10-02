@@ -10,27 +10,28 @@ double horizontalPadding = 24.w;
 double verticalPadding = 24.h;
 
 Color primaryColor = Color(Colors.black.value);
+Color errorColor = Colors.red.shade400;
 
 TextStyle textSmallThin =
-    GoogleFonts.lato(fontSize: fontSmall, fontWeight: FontWeight.w400);
+    GoogleFonts.inter(fontSize: fontSmall, fontWeight: FontWeight.w400);
 TextStyle textSmall =
-    GoogleFonts.lato(fontSize: fontSmall, fontWeight: FontWeight.normal);
+    GoogleFonts.inter(fontSize: fontSmall, fontWeight: FontWeight.normal);
 TextStyle textSmallTitle =
-    GoogleFonts.lato(fontSize: fontSmall, fontWeight: FontWeight.w600);
+    GoogleFonts.inter(fontSize: fontSmall, fontWeight: FontWeight.w600);
 
 TextStyle textNormalThin =
-    GoogleFonts.lato(fontSize: fontNormal, fontWeight: FontWeight.w400);
+    GoogleFonts.inter(fontSize: fontNormal, fontWeight: FontWeight.w400);
 TextStyle textNormal =
-    GoogleFonts.lato(fontSize: fontNormal, fontWeight: FontWeight.normal);
+    GoogleFonts.inter(fontSize: fontNormal, fontWeight: FontWeight.normal);
 TextStyle textNormalTitle =
-    GoogleFonts.lato(fontSize: fontNormal, fontWeight: FontWeight.bold);
+    GoogleFonts.inter(fontSize: fontNormal, fontWeight: FontWeight.bold);
 
 TextStyle textLargeThin =
-    GoogleFonts.lato(fontSize: fontLarge, fontWeight: FontWeight.w400);
+    GoogleFonts.inter(fontSize: fontLarge, fontWeight: FontWeight.w400);
 TextStyle textLarge =
-    GoogleFonts.lato(fontSize: fontLarge, fontWeight: FontWeight.normal);
+    GoogleFonts.inter(fontSize: fontLarge, fontWeight: FontWeight.normal);
 TextStyle textLargeTitle =
-    GoogleFonts.lato(fontSize: fontLarge, fontWeight: FontWeight.bold);
+    GoogleFonts.inter(fontSize: fontLarge, fontWeight: FontWeight.bold);
 
 OutlineInputBorder errorBorder = OutlineInputBorder(
     borderRadius: BorderRadius.circular(10),

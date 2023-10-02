@@ -1,15 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:pos_flutter/config/route/custom_router.dart';
+import 'package:pos_flutter/config/secure_storage/secure_storage.dart';
 import 'package:pos_flutter/config/theme/myTheme.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 class App extends StatelessWidget {
-  const App({super.key});
+  App({super.key});
+
+  String? token = '';
+
+  void getToken() async {
+    token = await SecureStorage().getToken();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Flutter Demo ',
+      navigatorKey: navigatorKey,
       theme: myTheme(),
+      initialRoute: token == null ? '/login' : '/',
       onGenerateRoute: CustomRouter.onGenerateRoute,
 
       // home: const MyHomePage(title: 'Flutter Demo Home Page'),

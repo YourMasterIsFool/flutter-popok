@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pos_flutter/app.dart';
 import 'package:pos_flutter/config/style/style.dart';
 import 'package:pos_flutter/config/theme/myTheme.dart';
 
@@ -45,53 +46,84 @@ class _MenuScrenState extends State<MenuScren> {
             SizedBox(
               height: verticalPadding,
             ),
-            Container(
-              child: Column(
-                children: [
-                  TextButton(
-                      style: ButtonStyle(
-                          foregroundColor:
-                              MaterialStatePropertyAll(primaryColor),
-                          backgroundColor: MaterialStateProperty.resolveWith(
-                              (states) => states.contains(MaterialState.pressed)
-                                  ? Colors.grey.shade300
-                                  : Colors.transparent),
-                          shape: MaterialStatePropertyAll(
-                              RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(0))),
-                          padding: MaterialStateProperty.all(
-                              EdgeInsets.symmetric(
-                                  vertical: verticalPadding / 2,
-                                  horizontal: horizontalPadding / 2))),
-                      onPressed: () {},
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Icon(Icons.person_3_outlined),
-                              SizedBox(
-                                width: horizontalPadding / 2,
-                              ),
-                              Text(
-                                "Profile",
-                                style: textTheme().titleMedium,
-                              )
-                            ],
-                          ),
-                          Icon(
-                            Icons.chevron_right,
-                            size: 26,
-                          )
-                        ],
-                      ))
-                ],
-              ),
-            )
+            _itemMenu(
+              menuName: "Profile",
+              icon: Icons.person,
+              navigationRoute: '/profile',
+            ),
+            _itemMenu(
+              menuName: "Products",
+              icon: Icons.dashboard,
+              navigationRoute: '/products',
+            ),
+            _itemMenu(
+              menuName: "Donation",
+              icon: Icons.wallet,
+              navigationRoute: '/donations',
+            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _itemMenu extends StatelessWidget {
+  const _itemMenu({
+    super.key,
+    required this.icon,
+    required this.menuName,
+    required this.navigationRoute,
+  });
+  final String menuName;
+
+  final IconData icon;
+  final String navigationRoute;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          TextButton(
+              style: ButtonStyle(
+                  foregroundColor: MaterialStatePropertyAll(primaryColor),
+                  backgroundColor: MaterialStateProperty.resolveWith((states) =>
+                      states.contains(MaterialState.pressed)
+                          ? Colors.grey.shade300
+                          : Colors.transparent),
+                  shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(0))),
+                  padding: MaterialStateProperty.all(EdgeInsets.symmetric(
+                      vertical: verticalPadding / 2,
+                      horizontal: horizontalPadding / 2))),
+              onPressed: () {
+                navigatorKey.currentState?.pushNamed(navigationRoute);
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Icon(icon),
+                      SizedBox(
+                        width: horizontalPadding / 2,
+                      ),
+                      Text(
+                        menuName,
+                        style: textTheme().titleMedium,
+                      )
+                    ],
+                  ),
+                  Icon(
+                    Icons.chevron_right,
+                    size: 26,
+                  )
+                ],
+              ))
+        ],
       ),
     );
   }
