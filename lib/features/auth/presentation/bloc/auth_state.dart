@@ -24,3 +24,11 @@ class SuccessLoginState extends AuthState {
 class InitalAuthState extends AuthState {
   const InitalAuthState();
 }
+
+class SuccessRegisterState extends AuthState {
+  const SuccessRegisterState();
+}
+
+class LoadingRegsterState extends AuthState {
+  const LoadingRegsterState();
+}

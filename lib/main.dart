@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pos_flutter/app.dart';
+import 'package:pos_flutter/features/article/presentation/bloc/article_bloc.dart';
 import 'package:pos_flutter/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:pos_flutter/features/donation/presentation/bloc/donasi_bloc.dart';
+import 'package:pos_flutter/features/pelatihan/presentation/bloc/pelatihan_bloc.dart';
+import 'package:pos_flutter/features/product/presentation/bloc/product_bloc.dart';
+import 'package:pos_flutter/features/profile/presentation/bloc/user_bloc.dart';
 import 'inject_container.dart';
 
 Future<void> main() async {
+  await dotenv.load(fileName: '.env');
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDependecies();
   runApp(const MyApp());
@@ -25,7 +31,11 @@ class MyApp extends StatelessWidget {
         // Use builder only if you need to use library outside ScreenUtilInit context
         builder: (_, child) {
           return MultiBlocProvider(providers: [
+            BlocProvider<ProductBloc>(create: (context) => ProductBloc()),
+            BlocProvider<ArticleBloc>(create: (context) => ArticleBloc()),
             BlocProvider<AuthBloc>(create: (context) => AuthBloc()),
+            BlocProvider<PelatihanBloc>(create: (context) => PelatihanBloc()),
+            BlocProvider<UserBloc>(create: (context) => UserBloc()),
             BlocProvider<DonasiBloc>(create: (context) => DonasiBloc())
           ], child: App());
         });

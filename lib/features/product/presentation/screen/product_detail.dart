@@ -1,227 +1,229 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttericon/font_awesome5_icons.dart';
+import 'package:pos_flutter/commons/modal_container.dart';
 import 'package:pos_flutter/config/style/style.dart';
 import 'package:pos_flutter/config/theme/myTheme.dart';
+import 'package:pos_flutter/features/product/domain/models/product_model.dart';
+import 'package:pos_flutter/features/product/presentation/bloc/product_bloc.dart';
+import 'package:pos_flutter/features/product/presentation/bloc/product_state.dart';
 
-class ProductDetail extends StatefulWidget {
-  const ProductDetail({super.key, this.id});
-  final String? id;
-
+class ProductDetailScreen extends StatefulWidget {
+  const ProductDetailScreen({super.key, required this.id});
+  final int id;
   @override
-  State<ProductDetail> createState() => _ProductDetailState();
+  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
 }
 
-class _ProductDetailState extends State<ProductDetail> {
-  Future<void> showModalSheet(context) async {
-    return await showModalBottomSheet(
+class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  late ProductBloc _productBloc;
+
+  final alamatController = TextEditingController();
+
+  int quantity = 1;
+
+  @override
+  void initState() {
+    _productBloc = context.read<ProductBloc>();
+    _productBloc.getProductDetail(widget.id);
+    super.initState();
+  }
+
+  Future<void> openModalPayment(
+      {required BuildContext context,
+      required ProductModel productModel}) async {
+    await showModalBottomSheet(
+        isScrollControlled: true,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         context: context,
-        builder: (context) => Container(
-              height: 400,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: horizontalPadding / 2,
-                        vertical: verticalPadding / 2),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("Pesan Popok"),
-                        IconButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            icon: Icon(Icons.close)),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: horizontalPadding / 2,
-                    ),
-                    child: Column(
+        builder: (context) => ModalContainer(
+            height: 500,
+            title: "Lanjutkan Pembayaran",
+            child: StatefulBuilder(
+              builder: (context, parentState) {
+                return Column(
+                  children: [
+                    Form(
+                        child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Price: "),
-                        SizedBox(
-                          height: 4.h,
-                        ),
-                        Text(
-                          "Rp. 17.000.000",
-                          style: textTheme().titleLarge,
-                        ),
-                        SizedBox(
-                          height: verticalPadding / 2,
-                        ),
                         Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: horizontalPadding / 3, vertical: 4.h),
-                          decoration: BoxDecoration(
-                              color: primaryColor,
-                              borderRadius: BorderRadius.circular(100)),
+                          // decoration: BoxDecoration(
+                          //     color: Colors.black,
+                          //     borderRadius: BorderRadius.circular(100)),
                           child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
                             children: [
                               GestureDetector(
-                                  onTap: () {},
+                                onTap: () {
+                                  if (quantity > 1) {
+                                    parentState(() {
+                                      quantity -= 1;
+                                    });
+                                  }
+                                },
+                                child: Container(
                                   child: Icon(
-                                    Icons.add,
+                                    FontAwesome5.minus,
                                     color: Colors.white,
-                                  )),
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 16.0, vertical: 4.0),
+                                  decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      borderRadius: BorderRadius.circular(100)),
+                                ),
+                              ),
                               Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: horizontalPadding),
+                                padding: EdgeInsets.symmetric(horizontal: 16.0),
                                 child: Text(
-                                  "17",
+                                  "${quantity}",
                                   style: textTheme()
-                                      .titleMedium
-                                      ?.copyWith(color: Colors.white),
+                                      .bodyMedium
+                                      ?.copyWith(color: Colors.black),
                                 ),
                               ),
                               GestureDetector(
-                                  onTap: () {},
+                                onTap: () {
+                                  parentState(() {
+                                    quantity += 1;
+                                  });
+                                },
+                                child: Container(
                                   child: Icon(
-                                    Icons.remove,
+                                    FontAwesome5.plus,
                                     color: Colors.white,
-                                  )),
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 16.0, vertical: 4.0),
+                                  decoration: BoxDecoration(
+                                      color: Colors.black,
+                                      borderRadius: BorderRadius.circular(100)),
+                                ),
+                              ),
                             ],
                           ),
-                        )
+                        ),
+                        SizedBox(
+                          height: 12.h,
+                        ),
+                        TextField(
+                          maxLines: 5,
+                          minLines: 4,
+                          decoration: InputDecoration(
+                            alignLabelWithHint: true,
+                            label: Text("isi alamat kamu"),
+                          ),
+                          controller: alamatController,
+                        ),
+                        SizedBox(
+                          height: 24.0,
+                        ),
+                        TextButton(
+                            style: ButtonStyle(),
+                            onPressed: () {},
+                            child: Center(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text("Proses pembayaran"),
+                                  Text(
+                                      " Rp. ${productModel.product_price * quantity}")
+                                ],
+                              ),
+                            ))
                       ],
-                    ),
-                  ),
-                  Spacer(),
-                  Padding(
-                    padding: EdgeInsets.all(12),
-                    child: TextButton(
-                        onPressed: () {},
-                        style: ButtonStyle(
-                            shape: MaterialStatePropertyAll(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(100))),
-                            padding: MaterialStatePropertyAll(
-                                EdgeInsets.symmetric(
-                                    horizontal: horizontalPadding,
-                                    vertical: verticalPadding / 2))),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text("Process to payment"),
-                            Text("Rp. 17.000.000")
-                          ],
-                        )),
-                  ),
-                  SizedBox(
-                    height: verticalPadding,
-                  ),
-                ],
-              ),
-            ));
+                    ))
+                  ],
+                );
+              },
+            )));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Text("Product Name"),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton.extended(
-          onPressed: () => showModalSheet(context),
-          label: Container(
-            width: 200.w,
-            child: Center(
-              child: Text("Buy popok Rp. 17.000.000"),
+    return BlocConsumer<ProductBloc, ProductState>(
+      listener: (context, state) {
+        // TODO: implement listener
+      },
+      builder: (context, state) {
+        if (state is LoadingGetDetailProduct) {
+          return Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
             ),
-            padding: EdgeInsets.symmetric(
-              vertical: verticalPadding / 3,
-              horizontal: horizontalPadding / 2,
+          );
+        }
+        if (state is SuccessGetDetailProduct) {
+          return Scaffold(
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
+            floatingActionButton: FloatingActionButton.extended(
+                onPressed: () => openModalPayment(
+                    context: context, productModel: state.product),
+                label: Row(
+                  children: [
+                    Text("Beli     Rp. ${state.product.product_price}")
+                  ],
+                )),
+            appBar: AppBar(
+              title: Text(state.product.product_title),
             ),
-          )),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.network(
-              'https://media.suara.com/pictures/970x544/2019/10/17/71800-ilustrasi-popok-bayi.jpg',
-              height: 250.h,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-            SizedBox(
-              height: verticalPadding / 2,
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: horizontalPadding / 2),
+            body: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "Rp. 1.700.000",
-                    style: textTheme().titleLarge,
+                  Image.network(
+                    '${dotenv.env['BASE_URL_API']}${state.product.file_path}',
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    height: 350.h,
                   ),
                   SizedBox(
                     height: 8.h,
                   ),
-                  Text(
-                    "Veniam commodo quis nulla reprehenderit dolore.",
-                    style: textTheme()
-                        .bodyMedium
-                        ?.copyWith(fontWeight: FontWeight.w400),
-                  ),
-                  SizedBox(
-                    height: 8.h,
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        height: 32,
-                        width: 32,
-                        decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(200)),
-                      ),
-                      SizedBox(
-                        width: 6.w,
-                      ),
-                      Text(
-                        "Verrandy bagus",
-                        style: textTheme().bodySmall,
-                      )
-                    ],
-                  ),
-                  SizedBox(
-                    height: verticalPadding / 2,
-                  ),
-                  Divider(),
-                  SizedBox(
-                    height: verticalPadding / 2,
-                  ),
-                  Text(
-                    "Deskripsi Product",
-                    style: textTheme().titleLarge,
-                  ),
-                  SizedBox(
-                    height: verticalPadding / 2,
-                  ),
-                  Text(
-                    "Ea esse nisi veniam fugiat Lorem duis commodo exercitation deserunt sunt. Sit elit quis sint ut excepteur duis Lorem id aliqua tempor Lorem veniam occaecat elit. Sint officia qui excepteur ad ut consectetur cillum fugiat amet occaecat in eiusmod sit tempor. Ut officia tempor eu quis ullamco commodo ullamco officia laborum et culpa. Minim veniam sint est adipisicing est elit ad elit. Ea duis anim minim mollit. Velit proident reprehenderit enim ipsum velit consequat dolore nostrud sint labore mollit nulla.",
-                    style: textTheme().bodyMedium?.copyWith(height: 1.5),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "${state.product.product_title}",
+                          style: textTheme().bodyMedium,
+                        ),
+                        SizedBox(
+                          height: 2.h,
+                        ),
+                        Text(
+                          "Rp. ${state.product.product_price}",
+                          style:
+                              textTheme().titleLarge?.copyWith(fontSize: 20.sp),
+                        ),
+                        SizedBox(
+                          height: 8.h,
+                        ),
+                        Text(
+                          state.product.product_description,
+                          style: textTheme().bodyMedium?.copyWith(
+                              color: Colors.grey.shade600, height: 1.5),
+                        )
+                      ],
+                    ),
                   )
                 ],
               ),
             ),
-            SizedBox(
-              height: verticalPadding * 4,
-            ),
-          ],
-        ),
-      ),
+          );
+        }
+
+        return Scaffold(
+          body: Text("${widget.id}"),
+        );
+      },
     );
   }
 }

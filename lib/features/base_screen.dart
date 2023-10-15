@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fluttericon/font_awesome5_icons.dart';
+import 'package:fluttericon/font_awesome_icons.dart';
 import 'package:pos_flutter/app.dart';
 import 'package:pos_flutter/config/route/custom_router.dart';
 import 'package:pos_flutter/features/dashboard/presentation/widget/dashboard_screen.dart';
@@ -19,8 +21,8 @@ class _BaseScreenState extends State<BaseScreen> {
     {
       'name': '/',
     },
+    // {'name': '/donasi'},
     {'name': '/menu'},
-    {'name': '/donasi'},
   ];
 
   static const List<Widget> _widgetOptions = <Widget>[
@@ -42,8 +44,21 @@ class _BaseScreenState extends State<BaseScreen> {
       selectedIndex = index;
     });
     baseScreenNavigator.currentState
-        ?.pushReplacementNamed(screens[index]['name'] as String);
+        ?.pushReplacementNamed(menus[index]['name'] as String);
   }
+
+  final List<Map<String, dynamic>> menus = [
+    {
+      'name': '/',
+      'navigation':
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Dashboard"),
+    },
+    {
+      'name': '/menu',
+      'navigation':
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Menu"),
+    },
+  ];
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,13 +70,7 @@ class _BaseScreenState extends State<BaseScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
         onTap: _onTap,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Dashboard"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.propane_rounded), label: "Products"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.propane_rounded), label: "Donasi"),
-        ],
+        items: [for (var item in menus) item['navigation']],
       ),
     );
   }

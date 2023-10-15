@@ -41,6 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
       child: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           // TODO: implement listener
+          print('state' + state.toString());
         },
         builder: (context, state) {
           return Scaffold(

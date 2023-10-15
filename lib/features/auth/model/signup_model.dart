@@ -12,7 +12,7 @@ class SignupModel extends Equatable {
   final String password;
   @override
   // TODO: implement props
-  List<Object?> get props => [email, password];
+  List<Object?> get props => [email, this.password, this.name];
 
   Map<String, dynamic> toJson() => _$SignupModelToJson(this);
   factory SignupModel.fromJson(Map<String, dynamic> json) =>

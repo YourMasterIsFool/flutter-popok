@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pos_flutter/app.dart';
+import 'package:pos_flutter/commons/loading_overflay.dart';
 import 'package:pos_flutter/config/secure_storage/secure_storage.dart';
 
 class ClientInterceptor extends Interceptor {
@@ -32,19 +33,23 @@ class ClientInterceptor extends Interceptor {
     options.headers.addAll({"Accept": "application/json"});
     options.headers.addAll({"content-type": "application/json"});
 
-    print('options' + options.headers.toString());
     final token = await SecureStorage().getToken();
-
-    if (token!.isNotEmpty) {
+    if (token != null) {
       options.headers.addAll({"Authorization": "Bearer $token"});
     }
-
     super.onRequest(options, handler);
   }
 
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
+  void onResponse(Response response, ResponseInterceptorHandler handler) async {
     // TODO: implement onResponse
+
+    final token = await SecureStorage().getToken();
+
+    // if (token == null) {
+    //   navigatorKey.currentState
+    //       ?.pushNamedAndRemoveUntil('/logoot', (route) => false);
+    // }
     super.onResponse(response, handler);
   }
 }

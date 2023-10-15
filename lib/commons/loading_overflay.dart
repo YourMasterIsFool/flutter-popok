@@ -15,6 +15,7 @@ class LoadingOverflay {
         barrierColor: Colors.black.withOpacity(0.2),
         context: context,
         builder: (context) => Dialog(
+              backgroundColor: Colors.black.withOpacity(0.2),
               child: Center(
                   child: CircularProgressIndicator(
                 color: primaryColor,

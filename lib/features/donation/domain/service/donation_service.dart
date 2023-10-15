@@ -21,10 +21,11 @@ class DonationService {
     }
   }
 
-  Future<Either<List<DonasiModel>, DioException?>?>
-      getListDonasiService() async {
+  Future<Either<List<DonasiModel>, DioException?>?> getListDonasiService({
+    Map<String, dynamic>? params,
+  }) async {
     try {
-      var response = await client.get('/donasi');
+      var response = await client.get('/donasi', queryParameters: params);
 
       if (response.statusCode == 200) {
         Iterable datas = response.data['data'];
@@ -36,7 +37,61 @@ class DonationService {
       }
     } catch (e) {
       if (e is DioException) {
+        print(e.response);
+
+        return right(e);
+      }
+    }
+  }
+
+  Future<Either<DonasiModel, DioException?>?> getDetailDonasiService(
+      int? id) async {
+    try {
+      var response = await client.get('/donasi/${id}');
+
+      if (response.statusCode == 200) {
+        return left(DonasiModel.fromJson(response.data['data']));
+      }
+    } catch (e) {
+      if (e is DioException) {
         print(e);
+
+        return right(e);
+      }
+    }
+  }
+
+  Future<Either<DonasiModel, DioException?>?> updateDonasiService(
+      int? id, DonasiModel schema) async {
+    try {
+      var response = await client.patch('/donasi/${id}', data: schema.toJson());
+
+      print(response.data['data']);
+      if (response.statusCode == 200) {
+        return left(DonasiModel.fromJson(response.data['data']));
+      }
+    } catch (e) {
+      if (e is DioException) {
+        print(e.response);
+
+        return right(e);
+      }
+    }
+  }
+
+  Future<Either<String, DioException?>?> updateStatusDonasi(
+      int id, int status) async {
+    try {
+      var response = await client
+          .patch('/donasi/${id}/update-status', data: {'status': status});
+
+      print(response.data['data']);
+      if (response.statusCode == 200) {
+        return left("Success update statu");
+      }
+    } catch (e) {
+      if (e is DioException) {
+        print(e.response);
 
         return right(e);
       }

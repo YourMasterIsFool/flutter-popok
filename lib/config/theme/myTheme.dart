@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pos_flutter/config/style/style.dart';
 
 ThemeData myTheme() {
@@ -71,6 +72,8 @@ IconButtonThemeData iconButtonThemeData() {
 TextButtonThemeData textButtonThemeData() {
   return TextButtonThemeData(
       style: ButtonStyle(
+          padding: MaterialStateProperty.all(
+              EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h)),
           foregroundColor: MaterialStatePropertyAll(Colors.white),
           backgroundColor: MaterialStateProperty.resolveWith((states) =>
               states.contains(MaterialState.pressed)

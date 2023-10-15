@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 double fontSmall = 12.sp;
-double fontNormal = 16.sp;
-double fontLarge = 20.sp;
+double fontNormal = 14.sp;
+double fontLarge = 18.sp;
 
 double horizontalPadding = 24.w;
 double verticalPadding = 24.h;

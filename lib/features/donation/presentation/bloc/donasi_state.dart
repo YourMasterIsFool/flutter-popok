@@ -22,8 +22,32 @@ class LoadingDonasiState extends DonasiState {
   const LoadingDonasiState();
 }
 
+class LoadingCreateDonasi extends DonasiState {
+  const LoadingCreateDonasi();
+}
+
 class SuccessGetListDonasi extends DonasiState {
   final List<DonasiModel> listDonasi;
 
   SuccessGetListDonasi(this.listDonasi);
+}
+
+class LoadingGetDetailDonasi extends DonasiState {
+  const LoadingGetDetailDonasi();
+}
+
+class SuccessGetDetailDonasi extends DonasiState {
+  final DonasiModel donasi;
+
+  SuccessGetDetailDonasi(this.donasi) : super(donasiModel: donasi);
+}
+
+class LoadingUpdateStatus extends DonasiState {
+  const LoadingUpdateStatus();
+}
+
+class SuccessUpdateStatus extends DonasiState {
+  // final DonasiModel donasi;
+
+  SuccessUpdateStatus();
 }

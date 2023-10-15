@@ -1,9 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pos_flutter/app.dart';
 import 'package:pos_flutter/config/style/style.dart';
 import 'package:pos_flutter/config/theme/myTheme.dart';
+import 'package:pos_flutter/features/article/domain/model/article_model.dart';
+import 'package:pos_flutter/features/article/presentation/bloc/article_bloc.dart';
+import 'package:pos_flutter/features/article/presentation/bloc/article_state.dart';
 
 class ArticleScreen extends StatefulWidget {
   const ArticleScreen({super.key});
@@ -13,150 +19,152 @@ class ArticleScreen extends StatefulWidget {
 }
 
 class _ArticleScreenState extends State<ArticleScreen> {
+  late ArticleBloc _articleBloc;
+
+  @override
+  void initState() {
+    _articleBloc = context.read<ArticleBloc>();
+    _articleBloc.getListArticleBloc();
+    _articleBloc.getListTopArticle();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Artikel "),
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.add))],
+        actions: [
+          IconButton(
+              onPressed: () {
+                navigatorKey.currentState?.pushNamed('/article-form');
+              },
+              icon: Icon(Icons.add))
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SizedBox(
+              height: 12.h,
+            ),
             Padding(
-              padding: EdgeInsets.all(12.0),
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding / 2),
               child: Text(
-                "Top Read Article",
-                style: textTheme().titleMedium,
+                "Article",
+                style: textTheme().bodyLarge,
               ),
             ),
-            _topReadArticle(),
-            _listArticle()
+            SizedBox(
+              height: 8.h,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12.w),
+              child: BlocConsumer<ArticleBloc, ArticleState>(
+                buildWhen: (prev, next) {
+                  return (next is SuccessGetListArticle ||
+                      next is LoadingGetArticleState);
+                },
+                listener: (context, state) {
+                  // TODO: implement listener
+                },
+                builder: (context, state) {
+                  if (state is LoadingGetArticleState) {
+                    return CircularProgressIndicator();
+                  }
+
+                  if (state is SuccessGetListArticle) {
+                    return ListView.builder(
+                      itemBuilder: (context, index) => ArticleWidget(
+                        article: state.articles![index],
+                      ),
+                      itemCount: state.articles!.length,
+                      shrinkWrap: true,
+                      primary: false,
+                    );
+                  }
+
+                  return Scaffold();
+                },
+              ),
+            )
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _listArticle() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: horizontalPadding / 2),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Artikel",
-            style: textTheme().titleMedium,
-          ),
-          SizedBox(
-            height: verticalPadding / 2,
-          ),
-          ListView.builder(
-            itemBuilder: (context, index) => articleCard(),
-            shrinkWrap: true,
-            primary: false,
-            itemCount: 4,
-          )
-        ],
-      ),
-    );
-  }
+class ArticleWidget extends StatelessWidget {
+  const ArticleWidget({
+    super.key,
+    required this.article,
+  });
+  final ArticleModel article;
 
-  Widget articleCard() {
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: 12.0),
-      child: GestureDetector(
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Container(
-            height: 75,
-            width: 100,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade200,
-            ),
-          ),
-          SizedBox(
-            width: 12.0,
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: verticalPadding / 6,
-              ),
-              Text(
-                "Test Article",
-                style: textTheme().titleSmall,
-              ),
-              SizedBox(
-                height: verticalPadding / 8,
-              ),
-              Text(
-                "2 januari 2023",
-                style: textTheme().bodySmall?.copyWith(fontSize: 8.sp),
-              )
-            ],
-          )
-        ]),
-      ),
-    );
-  }
-
-  Widget _topReadArticle() {
-    return Container(
-      padding: EdgeInsets.only(left: 12.h),
       width: double.infinity,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            height: verticalPadding / 2,
-          ),
-          Container(
-            height: 150.h,
-            child: ListView.builder(
-                itemCount: 3,
-                scrollDirection: Axis.horizontal,
-                shrinkWrap: true,
-                primary: true,
-                itemBuilder: (context, index) => Padding(
-                      padding: EdgeInsets.only(right: 12.w),
-                      child: GestureDetector(
-                        onTap: () {},
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              width: 150.w,
-                              height: 75.h,
-                              decoration: BoxDecoration(
-                                  color: Colors.grey.shade300,
-                                  borderRadius: BorderRadius.circular(10)),
-                            ),
-                            SizedBox(
-                              height: verticalPadding / 3,
-                            ),
-                            Text(
-                              "Controh Article",
-                              style: textTheme()
-                                  .titleSmall
-                                  ?.copyWith(fontSize: 14.0),
-                            ),
-                            SizedBox(
-                              height: 2,
-                            ),
-                            Text(
-                              "2 Januari 2023",
-                              style: textTheme()
-                                  .bodySmall
-                                  ?.copyWith(fontSize: 12.0),
-                            )
-                          ],
-                        ),
-                      ),
-                    )),
-          )
-        ],
+      margin: EdgeInsets.only(bottom: 12.h),
+      child: GestureDetector(
+        onTap: () {
+          navigatorKey.currentState!.pushNamed('/article-detail',
+              arguments: {'id': article.id}).then((value) {});
+        },
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.network(
+                '${dotenv.env["BASE_URL_API"]}${article.file_path}',
+                width: 150,
+                height: 100,
+                fit: BoxFit.cover,
+              ),
+            ),
+            SizedBox(
+              width: 12.w,
+            ),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 6.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("${article.title}"),
+                    SizedBox(
+                      height: 6.h,
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Text(
+                          "${article.description}",
+                          style: textTheme().bodySmall?.copyWith(
+                                color: Colors.grey.shade600,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                          maxLines: 2,
+                        ))
+                      ],
+                    ),
+                    SizedBox(
+                      height: 6.h,
+                    ),
+                    Text(
+                      "23 Agustus 2020",
+                      style: textTheme().bodySmall?.copyWith(
+                          fontSize: 10.sp, color: Colors.grey.shade500),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

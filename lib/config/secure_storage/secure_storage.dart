@@ -14,4 +14,16 @@ class SecureStorage {
   Future<void> deleteToken() async {
     await this.storage.delete(key: 'token');
   }
+
+  Future<void> setName(String email) async {
+    await this.storage.write(key: 'email', value: email);
+  }
+
+  Future<void> setRole(String role) async {
+    await this.storage.write(key: 'role', value: role);
+  }
+
+  Future<String?> getRole() async {
+    return await this.storage.read(key: 'role');
+  }
 }

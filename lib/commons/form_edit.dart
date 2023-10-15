@@ -6,21 +6,27 @@ class FormEdit extends StatefulWidget {
   const FormEdit(
       {super.key,
       this.value = '',
-      this.onPressed,
+      // required this.controller,
+      required this.onPressed,
       this.title = ' ',
       this.textError,
+      required this.onChanged,
       this.textHint});
   final String value;
   final String? textHint;
   final String title;
   final String? textError;
-  final VoidCallback? onPressed;
+  // final TextEditingController controller;
+  final VoidCallback onPressed;
+  final Function(String name) onChanged;
 
   @override
   State<FormEdit> createState() => _FormEditState();
 }
 
 class _FormEditState extends State<FormEdit> {
+  TextEditingController controller = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +34,7 @@ class _FormEditState extends State<FormEdit> {
         title: Text(widget.title),
         actions: [
           GestureDetector(
-            onTap: () {},
+            onTap: widget.onPressed,
             child: Icon(Icons.check),
           )
         ],
@@ -43,6 +49,8 @@ class _FormEditState extends State<FormEdit> {
               ),
               TextFormField(
                 style: textTheme().bodyMedium,
+                // controller: widget.controller,
+                onChanged: widget.onChanged,
                 initialValue: widget.value,
                 decoration: InputDecoration(
                     contentPadding: EdgeInsets.symmetric(horizontal: 0),
