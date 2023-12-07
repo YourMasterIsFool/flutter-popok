@@ -4,12 +4,15 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttericon/font_awesome_icons.dart';
 import 'package:pos_flutter/app.dart';
+import 'package:pos_flutter/commons/CustomSnackbar.dart';
 import 'package:pos_flutter/commons/loading_overflay.dart';
 import 'package:pos_flutter/config/style/style.dart';
 import 'package:pos_flutter/config/theme/myTheme.dart';
 import 'package:pos_flutter/features/article/presentation/bloc/article_bloc.dart';
 import 'package:pos_flutter/features/article/presentation/bloc/article_state.dart';
 import 'package:pos_flutter/utils/formattingDate.dart';
+
+import '../../../../config/secure_storage/secure_storage.dart';
 
 class ArticleDetailScreen extends StatefulWidget {
   const ArticleDetailScreen({super.key, required this.id});
@@ -22,10 +25,19 @@ class ArticleDetailScreen extends StatefulWidget {
 class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
   late ArticleBloc _articleBloc;
 
+  String? role_name;
+
+  void getRoleUser() async {
+    role_name = await SecureStorage().getRole();
+  }
+
   @override
   void initState() {
     _articleBloc = context.read<ArticleBloc>();
     _articleBloc.detailArticleBloc(id: widget.id);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getRoleUser();
+    });
     super.initState();
   }
 
@@ -43,6 +55,8 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
         }
         if (state is SuccessDeleteArticle) {
           LoadingOverflay.of(context).close();
+          ScaffoldMessenger.of(context).showSnackBar(
+              CustomSnackbar().SuccessSnackbar(message: state.success));
           Navigator.pop(context);
         }
       },
@@ -57,26 +71,29 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
         if (state is SuccessGetDetailArticle) {
           return Scaffold(
             appBar: AppBar(
-              actions: [
-                IconButton(
-                  onPressed: () {
-                    navigatorKey.currentState?.pushNamed('/article-form',
-                        arguments: {'id': widget.id}).then((value) async {
-                      await _articleBloc.detailArticleBloc(id: widget.id);
-                    });
-                  },
-                  icon: Icon(Icons.edit),
-                ),
-                IconButton(
-                  onPressed: () async {
-                    await _articleBloc.deleteArticleBloc(id: widget.id);
-                  },
-                  icon: Icon(
-                    FontAwesome.trash,
-                    color: Colors.red,
-                  ),
-                ),
-              ],
+              title: Text("Detail Artikel"),
+              actions: role_name == 'admin'
+                  ? [
+                      IconButton(
+                        onPressed: () {
+                          navigatorKey.currentState?.pushNamed('/article-form',
+                              arguments: {'id': widget.id}).then((value) async {
+                            await _articleBloc.detailArticleBloc(id: widget.id);
+                          });
+                        },
+                        icon: Icon(Icons.edit),
+                      ),
+                      IconButton(
+                        onPressed: () async {
+                          await _articleBloc.deleteArticleBloc(id: widget.id);
+                        },
+                        icon: Icon(
+                          FontAwesome.trash,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ]
+                  : null,
             ),
             body: SingleChildScrollView(
               child: Column(

@@ -11,6 +11,7 @@ class App extends StatelessWidget {
   String? token = '';
 
   void getToken() async {
+    // await SecureStorage().removeAllSecureStorage();
     token = await SecureStorage().getToken();
   }
 
@@ -20,7 +21,7 @@ class App extends StatelessWidget {
       title: 'Flutter Demo ',
       navigatorKey: navigatorKey,
       theme: myTheme(),
-      initialRoute: token == null ? '/login' : '/',
+      initialRoute: '/login',
       onGenerateRoute: CustomRouter.onGenerateRoute,
 
       // home: const MyHomePage(title: 'Flutter Demo Home Page'),

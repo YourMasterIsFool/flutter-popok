@@ -27,3 +27,33 @@ class SuccessGetListPelatihan extends PelatihanState {
 
   SuccessGetListPelatihan(this.listPelatihan);
 }
+
+class LoadingRequestJoinPelatihan extends PelatihanState {
+  const LoadingRequestJoinPelatihan();
+}
+
+class SuccessRequestJoinPelatihan extends PelatihanState {
+  final String successMessage;
+
+  SuccessRequestJoinPelatihan(this.successMessage);
+}
+
+class LoadingDetailPelatihan extends PelatihanState {
+  const LoadingDetailPelatihan();
+}
+
+class SuccessDetailPelatihan extends PelatihanState {
+  final PelatihanModel pelatihan;
+
+  SuccessDetailPelatihan(this.pelatihan) : super(pelatihanModel: pelatihan);
+}
+
+class LoadingUpdateStatusMember extends PelatihanState {
+  const LoadingUpdateStatusMember();
+}
+
+class SuccessUpdateStatusMember extends PelatihanState {
+  final String successMessage;
+
+  SuccessUpdateStatusMember(this.successMessage);
+}

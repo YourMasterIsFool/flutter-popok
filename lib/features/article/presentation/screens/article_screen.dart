@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pos_flutter/app.dart';
+import 'package:pos_flutter/config/secure_storage/secure_storage.dart';
 import 'package:pos_flutter/config/style/style.dart';
 import 'package:pos_flutter/config/theme/myTheme.dart';
 import 'package:pos_flutter/features/article/domain/model/article_model.dart';
@@ -21,78 +22,105 @@ class ArticleScreen extends StatefulWidget {
 class _ArticleScreenState extends State<ArticleScreen> {
   late ArticleBloc _articleBloc;
 
+  String? role_name;
+
+  void getRoleUser() async {
+    role_name = await SecureStorage().getRole();
+  }
+
   @override
   void initState() {
     _articleBloc = context.read<ArticleBloc>();
     _articleBloc.getListArticleBloc();
     _articleBloc.getListTopArticle();
+    getRoleUser();
+    WidgetsBinding.instance.addPostFrameCallback((_) {});
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Artikel "),
-        actions: [
-          IconButton(
-              onPressed: () {
-                navigatorKey.currentState?.pushNamed('/article-form');
+    return Builder(builder: (context) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("Artikel"),
+          actions: [
+            FutureBuilder(
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  print('snapshot' + snapshot.data.toString());
+                  return snapshot.data == 'admin'
+                      ? IconButton(
+                          onPressed: () {
+                            navigatorKey.currentState
+                                ?.pushNamed('/article-form');
+                          },
+                          icon: Icon(Icons.add))
+                      : Container();
+                }
+
+                return Container();
               },
-              icon: Icon(Icons.add))
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: 12.h,
+              future: SecureStorage().getRole(),
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: horizontalPadding / 2),
-              child: Text(
-                "Article",
-                style: textTheme().bodyLarge,
-              ),
-            ),
-            SizedBox(
-              height: 8.h,
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12.w),
-              child: BlocConsumer<ArticleBloc, ArticleState>(
-                buildWhen: (prev, next) {
-                  return (next is SuccessGetListArticle ||
-                      next is LoadingGetArticleState);
-                },
-                listener: (context, state) {
-                  // TODO: implement listener
-                },
-                builder: (context, state) {
-                  if (state is LoadingGetArticleState) {
-                    return CircularProgressIndicator();
-                  }
-
-                  if (state is SuccessGetListArticle) {
-                    return ListView.builder(
-                      itemBuilder: (context, index) => ArticleWidget(
-                        article: state.articles![index],
-                      ),
-                      itemCount: state.articles!.length,
-                      shrinkWrap: true,
-                      primary: false,
-                    );
-                  }
-
-                  return Scaffold();
-                },
-              ),
-            )
           ],
         ),
-      ),
-    );
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 12.h,
+              ),
+              Padding(
+                padding:
+                    EdgeInsets.symmetric(horizontal: horizontalPadding / 2),
+                child: Text(
+                  "Artikel",
+                  style: textTheme().bodyLarge,
+                ),
+              ),
+              SizedBox(
+                height: 8.h,
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12.w),
+                child: BlocConsumer<ArticleBloc, ArticleState>(
+                  buildWhen: (prev, next) {
+                    return (next is SuccessGetListArticle ||
+                        next is LoadingGetArticleState);
+                  },
+                  listener: (context, state) {
+                    // TODO: implement listener
+                  },
+                  builder: (context, state) {
+                    if (state is LoadingGetArticleState) {
+                      return CircularProgressIndicator();
+                    }
+
+                    if (state is SuccessGetListArticle) {
+                      return Container(
+                        height: MediaQuery.of(context).size.height * 80 / 100,
+                        child: ListView.builder(
+                          itemBuilder: (context, index) => ArticleWidget(
+                            article: state.articles![index],
+                          ),
+                          itemCount: state.articles!.length,
+                          shrinkWrap: true,
+                          primary: true,
+                        ),
+                      );
+                    }
+
+                    return Container();
+                  },
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    });
   }
 }
 

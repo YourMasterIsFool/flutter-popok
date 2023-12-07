@@ -12,13 +12,26 @@ class LoadingOverflay {
     print('open');
     showDialog(
         barrierDismissible: false,
-        barrierColor: Colors.black.withOpacity(0.2),
+        barrierColor: Colors.black.withOpacity(0.6),
         context: context,
         builder: (context) => Dialog(
-              backgroundColor: Colors.black.withOpacity(0.2),
+              backgroundColor: Colors.transparent,
+
+              // backgroundColor: Colors.black.withOpacity(0.6),
               child: Center(
-                  child: CircularProgressIndicator(
-                color: primaryColor,
+                  child: Container(
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20)),
+                height: 75,
+                width: 75,
+                child: Center(
+                  child: Container(
+                    height: 30,
+                    width: 30,
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
               )),
             ));
   }

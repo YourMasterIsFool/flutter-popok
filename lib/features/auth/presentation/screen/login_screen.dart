@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pos_flutter/app.dart';
+import 'package:pos_flutter/commons/CustomSnackbar.dart';
+import 'package:pos_flutter/commons/loading_overflay.dart';
 import 'package:pos_flutter/config/style/style.dart';
 import 'package:pos_flutter/config/theme/myTheme.dart';
 import 'package:pos_flutter/features/auth/model/login_model.dart';
@@ -42,6 +45,20 @@ class _LoginScreenState extends State<LoginScreen> {
         listener: (context, state) {
           // TODO: implement listener
           print('state' + state.toString());
+
+          if (state is LoadingLoginState) {
+            LoadingOverflay.of(context).open();
+          }
+          if (state is ErrorLoginState) {
+            LoadingOverflay.of(context).close();
+            ScaffoldMessenger.of(context).showSnackBar(CustomSnackbar()
+                .ErorrSnackbar(message: state.error.response.toString()));
+          }
+          if (state is SuccessLoginState) {
+            LoadingOverflay.of(context).close();
+            ScaffoldMessenger.of(context).showSnackBar(
+                CustomSnackbar().SuccessSnackbar(message: "Success Login"));
+          }
         },
         builder: (context, state) {
           return Scaffold(
@@ -52,14 +69,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    (state is ErrorLoginState)
-                        ? Text("${state.error.toString()}")
-                        : Container(),
                     SizedBox(
                       height: verticalPadding * 2,
                     ),
                     Text(
-                      "Login Ke Popoku",
+                      "Masuk Ke PopokCare",
                       style: textTheme().titleLarge?.copyWith(fontSize: 32.0),
                     ),
                     SizedBox(
@@ -69,6 +83,24 @@ class _LoginScreenState extends State<LoginScreen> {
                       "",
                       style: textTheme().titleMedium,
                     ),
+                    (state is ErrorLoginState)
+                        ? Container(
+                            decoration: BoxDecoration(
+                                color: errorColor,
+                                borderRadius: BorderRadius.circular(10)),
+                            padding: EdgeInsets.all(12),
+                            child: Column(
+                              children: [
+                                Text(
+                                  state.error.response?.data['message'],
+                                  style: textTheme()
+                                      .bodySmall
+                                      ?.copyWith(color: Colors.white),
+                                )
+                              ],
+                            ),
+                          )
+                        : Container(),
                     SizedBox(
                       height: verticalPadding,
                     ),
@@ -116,8 +148,18 @@ class _LoginScreenState extends State<LoginScreen> {
                               height: verticalPadding / 2,
                             ),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    navigatorKey.currentState
+                                        ?.pushNamed('/forgot-password-email');
+                                  },
+                                  child: Text(
+                                    "Lupa Password?",
+                                    style: textTheme().bodySmall,
+                                  ),
+                                ),
                                 GestureDetector(
                                   onTap: () =>
                                       Navigator.pushNamed(context, '/signup'),
@@ -146,7 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           EdgeInsets.symmetric(
                                               horizontal: horizontalPadding / 2,
                                               vertical: verticalPadding / 2))),
-                                  child: Text("Sign in")),
+                                  child: Text("Masuk")),
                             )
                           ],
                         ))

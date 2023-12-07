@@ -15,6 +15,7 @@ class AuthBloc extends Cubit<AuthState> {
   AuthBloc() : super(const InitalAuthState());
 
   Future<void> loginBloc(LoginModel loginModel) async {
+    emit(LoadingLoginState());
     var response = await authService.loginService(loginModel);
 
     response?.fold((l) async {
@@ -35,7 +36,9 @@ class AuthBloc extends Cubit<AuthState> {
         navigatorKey.currentState
             ?.pushNamedAndRemoveUntil('/', (route) => false);
       }
-    }, (r) => null);
+    }, (r) {
+      emit(ErrorLoginState(r));
+    });
   }
 
   Future<void> logoutHandler() async {
@@ -64,6 +67,47 @@ class AuthBloc extends Cubit<AuthState> {
 
     response?.fold((l) async {
       emit(SuccessRegisterState());
-    }, (r) => null);
+    }, (r) {
+      emit(ErrorRegister(r.response?.data['message']));
+    });
+  }
+
+  Future<void> checkEmailIsExist(String email) async {
+    emit(LoadingForgotEmailState());
+    var response = await AuthService().checkEmailIsExits(email);
+
+    response?.fold((l) async {
+      await SecureStorage().setEmailForgotPassword(l['email']);
+      await SecureStorage().setQuestionForgotPassword(l['question']);
+      emit(SuccesssForgotEmailState(l['email']));
+    }, (r) {
+      emit(ErrorForgotEmailState(r));
+    });
+  }
+
+  Future<void> checkPasswordHintIsCorrect(String question_answer) async {
+    emit(LoadingHintPassword());
+    final email = await SecureStorage().getEmailForgotPassword();
+    var response = await AuthService().checkHintPasswordIsCorrect(
+        email: email ?? '', question_answer: question_answer);
+
+    response?.fold((l) async {
+      emit(SuccessHintPassword('Check'));
+    }, (r) {
+      emit(ErorrHintPassword(r));
+    });
+  }
+
+  Future<void> changePasswordBlock(String password) async {
+    emit(LoadingChageNewPassword());
+    final email = await SecureStorage().getEmailForgotPassword();
+    var response = await AuthService()
+        .changePassword(email: email ?? '', new_password: password);
+
+    response?.fold((l) async {
+      emit(SuccessChangeNewPassword(l));
+    }, (r) {
+      emit(ErorrChangeNewPassword(r));
+    });
   }
 }

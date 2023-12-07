@@ -17,7 +17,12 @@ class InitialUserState extends UserState {
 
 class SuccessCreateUser extends UserState {
   final String success;
-  const SuccessCreateUser(this.success) : super(success: success);
+  const SuccessCreateUser(this.success);
+}
+
+class ErrorCreateUser extends UserState {
+  final String error;
+  const ErrorCreateUser(this.error);
 }
 
 class LoadingUserState extends UserState {
@@ -46,4 +51,18 @@ class LoadingGetListUser extends UserState {
 
 class LoadingCreateUser extends UserState {
   const LoadingCreateUser();
+}
+
+class LoadingUpdateUser extends UserState {
+  const LoadingUpdateUser();
+}
+
+class LoadingGetUserAdmin extends UserState {
+  const LoadingGetUserAdmin();
+}
+
+class SuccessGetUserAdmin extends UserState {
+  final UserModel admin;
+
+  const SuccessGetUserAdmin(this.admin);
 }

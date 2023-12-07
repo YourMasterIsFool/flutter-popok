@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pos_flutter/app.dart';
+import 'package:pos_flutter/commons/CustomSnackbar.dart';
 import 'package:pos_flutter/commons/loading_overflay.dart';
 import 'package:pos_flutter/config/style/style.dart';
 import 'package:pos_flutter/config/theme/myTheme.dart';
@@ -19,6 +21,8 @@ class FormKurirScreen extends StatefulWidget {
 class _FormKurirScreenState extends State<FormKurirScreen> {
   final emailController = TextEditingController();
   final namaController = TextEditingController();
+  final phoneNumberController = TextEditingController();
+
   final passwordController = TextEditingController();
 
   late UserBloc _userBloc;
@@ -36,6 +40,7 @@ class _FormKurirScreenState extends State<FormKurirScreen> {
       email: emailController.text,
       name: namaController.text,
       role_id: 2,
+      phone_number: phoneNumberController.text,
       password: passwordController.text,
     );
 
@@ -61,6 +66,11 @@ class _FormKurirScreenState extends State<FormKurirScreen> {
             ScaffoldMessenger.of(context)
                 .showSnackBar(SnackBar(content: Text("${state.success}")));
             navigatorKey.currentState?.pop();
+          }
+          if (state is ErrorCreateUser) {
+            LoadingOverflay.of(context).close();
+            ScaffoldMessenger.of(context).showSnackBar(
+                CustomSnackbar().ErorrSnackbar(message: state.error));
           }
         },
         builder: (context, state) {
@@ -96,6 +106,18 @@ class _FormKurirScreenState extends State<FormKurirScreen> {
                             controller: namaController,
                             decoration:
                                 InputDecoration(label: Text("Nama Kurir")),
+                          ),
+                          SizedBox(
+                            height: 12.h,
+                          ),
+                          TextFormField(
+                            controller: phoneNumberController,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                            decoration:
+                                InputDecoration(label: Text("No handphone")),
                           ),
                           SizedBox(
                             height: 12.h,

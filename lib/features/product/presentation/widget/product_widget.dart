@@ -52,7 +52,7 @@ class ProductWidget extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      "Popok Ilmiah  ${productModel.id}",
+                      "${productModel.product_title}",
                       style: textTheme()
                           .bodyMedium
                           ?.copyWith(fontWeight: FontWeight.w300),
@@ -61,18 +61,24 @@ class ProductWidget extends StatelessWidget {
                       height: 2.h,
                     ),
                     Text(
-                      "Rp. 100.000",
-                      style: textTheme().titleLarge,
+                      "Rp. ${productModel.product_price}",
+                      style: textTheme().titleMedium,
+                    ),
+                    SizedBox(
+                      height: 12.h,
+                    ),
+                    Row(
+                      children: [Text("Stok: "), Text("${productModel?.stok}")],
                     ),
                     SizedBox(
                       height: 8.h,
                     ),
                     Text(
-                      "Lorpem ipuLaboris quis sunt tempor ullamco tempor. Mollit in adipisicing tempor non. Est nulla ullamco exercitation excepteur minim qui et in id nostrud labore qui reprehenderit labore.",
+                      "${productModel.product_description}",
                       style: textTheme().bodySmall?.copyWith(
                           color: Colors.grey.shade600,
                           overflow: TextOverflow.ellipsis),
-                      maxLines: 3,
+                      maxLines: 2,
                     )
                   ],
                   crossAxisAlignment: CrossAxisAlignment.start,

@@ -7,6 +7,10 @@ ThemeData myTheme() {
       colorScheme: colorSceme(),
       scaffoldBackgroundColor: Colors.grey.shade100,
       appBarTheme: appBarTheme(),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          unselectedItemColor: Colors.grey.shade400,
+          backgroundColor: Colors.indigo,
+          selectedItemColor: Colors.white),
       inputDecorationTheme: inputDecorationTheme(),
       iconButtonTheme: iconButtonThemeData(),
       textButtonTheme: textButtonThemeData(),
@@ -28,14 +32,13 @@ TextTheme textTheme() {
 AppBarTheme appBarTheme() {
   return AppBarTheme(
       elevation: 0,
-      titleTextStyle:
-          textTheme().titleMedium?.copyWith(color: Colors.grey.shade800),
-      backgroundColor: Colors.grey.shade50,
-      foregroundColor: Colors.grey.shade800);
+      titleTextStyle: textTheme().titleMedium?.copyWith(color: Colors.white),
+      backgroundColor: Colors.indigo,
+      foregroundColor: Colors.white);
 }
 
 ColorScheme colorSceme() {
-  return ColorScheme.fromSeed(seedColor: Colors.black);
+  return ColorScheme.fromSeed(seedColor: Colors.black, primary: Colors.indigo);
 }
 
 FloatingActionButtonThemeData floatingActionButtonThemeData() {

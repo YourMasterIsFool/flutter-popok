@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttericon/entypo_icons.dart';
 import 'package:fluttericon/font_awesome5_icons.dart';
 import 'package:fluttericon/font_awesome_icons.dart';
 import 'package:pos_flutter/app.dart';
@@ -51,12 +52,17 @@ class _BaseScreenState extends State<BaseScreen> {
     {
       'name': '/',
       'navigation':
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Dashboard"),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Beranda"),
+    },
+    {
+      'name': '/order-list',
+      'navigation':
+          BottomNavigationBarItem(icon: Icon(Entypo.bag), label: "Pesanan"),
     },
     {
       'name': '/menu',
       'navigation':
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Menu"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
     },
   ];
 

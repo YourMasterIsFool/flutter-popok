@@ -10,6 +10,8 @@ class ClientInterceptor extends Interceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     // TODO: implement onError
 
+    print('errr' + err.response.toString());
+
     if (err.response?.statusCode == 401) {
       // navigate to the authentication screen
       await SecureStorage().deleteToken();
@@ -34,9 +36,11 @@ class ClientInterceptor extends Interceptor {
     options.headers.addAll({"content-type": "application/json"});
 
     final token = await SecureStorage().getToken();
+    print("token" + token.toString());
     if (token != null) {
       options.headers.addAll({"Authorization": "Bearer $token"});
     }
+    print("headers" + options.headers.toString());
     super.onRequest(options, handler);
   }
 

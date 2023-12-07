@@ -6,6 +6,10 @@ import 'package:pos_flutter/app.dart';
 import 'package:pos_flutter/features/article/presentation/bloc/article_bloc.dart';
 import 'package:pos_flutter/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:pos_flutter/features/donation/presentation/bloc/donasi_bloc.dart';
+import 'package:pos_flutter/features/donation/presentation/bloc/donasi_status_bloc.dart';
+import 'package:pos_flutter/features/lupa_password/presentation/bloc/lupa_password_bloc.dart';
+import 'package:pos_flutter/features/order/presentation/bloc/order_bloc.dart';
+import 'package:pos_flutter/features/order/presentation/bloc/order_status_bloc.dart';
 import 'package:pos_flutter/features/pelatihan/presentation/bloc/pelatihan_bloc.dart';
 import 'package:pos_flutter/features/product/presentation/bloc/product_bloc.dart';
 import 'package:pos_flutter/features/profile/presentation/bloc/user_bloc.dart';
@@ -32,6 +36,13 @@ class MyApp extends StatelessWidget {
         builder: (_, child) {
           return MultiBlocProvider(providers: [
             BlocProvider<ProductBloc>(create: (context) => ProductBloc()),
+            BlocProvider<OrderStatusBloc>(
+                create: (context) => OrderStatusBloc()),
+            BlocProvider<OrderBloc>(create: (context) => OrderBloc()),
+            BlocProvider<DonasiStatusBloc>(
+                create: (context) => DonasiStatusBloc()),
+            BlocProvider<LupaPasswordBloc>(
+                create: (context) => LupaPasswordBloc()),
             BlocProvider<ArticleBloc>(create: (context) => ArticleBloc()),
             BlocProvider<AuthBloc>(create: (context) => AuthBloc()),
             BlocProvider<PelatihanBloc>(create: (context) => PelatihanBloc()),

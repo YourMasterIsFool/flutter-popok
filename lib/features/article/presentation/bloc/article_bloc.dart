@@ -50,7 +50,8 @@ class ArticleBloc extends Cubit<ArticleState> {
     var response = await _articleService.deleteArticleService(id: id);
 
     response?.fold((l) async {
-      emit(LoadingDeleteArticle());
+      await getListArticleBloc();
+      emit(SuccessDeleteArticle("Berhasil menghapus Artikel"));
     }, (r) {});
   }
 

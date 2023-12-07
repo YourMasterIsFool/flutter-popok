@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_flutter/app.dart';
+import 'package:pos_flutter/config/secure_storage/secure_storage.dart';
 import 'package:pos_flutter/config/style/style.dart';
 import 'package:pos_flutter/config/theme/myTheme.dart';
 import 'package:pos_flutter/features/profile/presentation/bloc/user_bloc.dart';
@@ -43,64 +44,83 @@ class _MenuScrenState extends State<MenuScren> {
         if (state is SuccessGetUser) {
           return Scaffold(
             appBar: AppBar(
-              title: Text("Menu"),
+              title: Text("Profil"),
             ),
             body: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Container(
-                    child: Center(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
+              child: FutureBuilder(
+                  future: SecureStorage().getRole(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Column(
                         children: [
+                          SizedBox(
+                            height: verticalPadding * 2,
+                          ),
                           Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                                color: Colors.grey,
-                                borderRadius: BorderRadius.circular(100)),
+                            child: Center(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 100,
+                                    height: 100,
+                                    decoration: BoxDecoration(
+                                        color: Colors.grey,
+                                        borderRadius:
+                                            BorderRadius.circular(100)),
+                                  ),
+                                  SizedBox(
+                                    height: verticalPadding / 3,
+                                  ),
+                                  Text(
+                                    "${state.user.name}",
+                                    style: textTheme().titleLarge,
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                           SizedBox(
-                            height: verticalPadding / 3,
+                            height: verticalPadding,
                           ),
-                          Text(
-                            "${state.user.name}",
-                            style: textTheme().titleLarge,
+                          _itemMenu(
+                            menuName: "Profil",
+                            icon: Icons.person,
+                            navigationRoute: '/profile',
+                          ),
+                          snapshot.data == 'admin'
+                              ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // _itemMenu(
+                                    //   menuName: "Order",
+                                    //   icon: Icons.dashboard,
+                                    //   navigationRoute: '/order',
+                                    // ),
+                                    // _itemMenu(
+                                    //   menuName: "Donation",
+                                    //   icon: Icons.wallet,
+                                    //   navigationRoute: '/donations',
+                                    // ),
+                                    _itemMenu(
+                                      menuName: "Manajemen Kurir",
+                                      icon: Icons.wallet,
+                                      navigationRoute: '/list-kurir',
+                                    ),
+                                  ],
+                                )
+                              : Container(),
+                          _itemMenu(
+                            menuName: "Keluar",
+                            icon: Icons.wallet,
+                            navigationRoute: '/logout',
                           ),
                         ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: verticalPadding,
-                  ),
-                  _itemMenu(
-                    menuName: "Profile",
-                    icon: Icons.person,
-                    navigationRoute: '/profile',
-                  ),
-                  _itemMenu(
-                    menuName: "Products",
-                    icon: Icons.dashboard,
-                    navigationRoute: '/products',
-                  ),
-                  _itemMenu(
-                    menuName: "Donation",
-                    icon: Icons.wallet,
-                    navigationRoute: '/donations',
-                  ),
-                  _itemMenu(
-                    menuName: "Managemen Kurir",
-                    icon: Icons.wallet,
-                    navigationRoute: '/list-kurir',
-                  ),
-                  _itemMenu(
-                    menuName: "Logout",
-                    icon: Icons.wallet,
-                    navigationRoute: '/logout',
-                  ),
-                ],
-              ),
+                      );
+                    }
+
+                    return Container();
+                  }),
             ),
           );
         }

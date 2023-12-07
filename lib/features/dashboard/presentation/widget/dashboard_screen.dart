@@ -13,12 +13,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Popoku"),
-        actions: [
-          IconButton(
-              color: Colors.black,
-              onPressed: () {},
-              icon: Icon(Icons.person_rounded))
-        ],
+        actions: [],
       ),
     );
   }

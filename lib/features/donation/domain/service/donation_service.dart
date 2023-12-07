@@ -97,4 +97,17 @@ class DonationService {
       }
     }
   }
+
+  Future<Either<String, DioException?>?> delete_donasi_service(
+      {int? id}) async {
+    try {
+      var response = await client.delete('/donasi/${id}');
+
+      return left("Berhasil menghapus donasi");
+    } catch (e) {
+      if (e is DioException) {
+        return right(e);
+      }
+    }
+  }
 }

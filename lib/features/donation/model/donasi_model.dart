@@ -28,8 +28,8 @@ class DonasiModel extends Equatable {
 
   final DateTime? date_donasi;
 
-  final double? latitude;
-  final double? longitude;
+  final String? latitude;
+  final String? longitude;
 
   @override
   // TODO: implement props

@@ -1,8 +1,12 @@
+import 'package:dartz/dartz.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pos_flutter/features/article/presentation/screens/article_detail_screen.dart';
 import 'package:pos_flutter/features/article/presentation/screens/article_form_screen.dart';
 import 'package:pos_flutter/features/article/presentation/screens/article_screen.dart';
+import 'package:pos_flutter/features/auth/presentation/screen/change_pasword.dart';
+import 'package:pos_flutter/features/auth/presentation/screen/forgot_password_email.dart';
+import 'package:pos_flutter/features/auth/presentation/screen/hint_password.dart';
 import 'package:pos_flutter/features/auth/presentation/screen/login_screen.dart';
 import 'package:pos_flutter/features/auth/presentation/screen/logout_screen.dart';
 import 'package:pos_flutter/features/auth/presentation/screen/signup_screen.dart';
@@ -14,6 +18,9 @@ import 'package:pos_flutter/features/kegiatan/presentation/screens/kegiatan_scre
 import 'package:pos_flutter/features/kurir/presentation/screens/fomr_kurir_screen.dart';
 import 'package:pos_flutter/features/kurir/presentation/screens/list_kurir_screen.dart';
 import 'package:pos_flutter/features/menu/presentation/screen/menu_screen.dart';
+import 'package:pos_flutter/features/order/presentation/screens/order_detail_screen.dart';
+import 'package:pos_flutter/features/order/presentation/screens/order_list_screen.dart';
+import 'package:pos_flutter/features/pelatihan/presentation/screens/pelatihan_detail_screen.dart';
 import 'package:pos_flutter/features/pelatihan/presentation/screens/pelatihan_form_screen.dart';
 import 'package:pos_flutter/features/pelatihan/presentation/screens/pelatihan_screen.dart';
 import 'package:pos_flutter/features/product/presentation/screen/product_detail.dart';
@@ -34,6 +41,12 @@ class CustomRouter {
         return PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
                 MenuScren(),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero);
+      case '/order-list':
+        return PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                OrderListScreen(),
             transitionDuration: Duration.zero,
             reverseTransitionDuration: Duration.zero);
 
@@ -69,12 +82,30 @@ class CustomRouter {
 
       case '/pelatihan':
         return MaterialPageRoute(builder: (context) => PelatihanScreen());
+      case '/forgot-password-email':
+        return MaterialPageRoute(
+            builder: (context) => ForgotPasswordEmailScreen());
+      case '/forgot-password-hint':
+        return MaterialPageRoute(builder: (context) => HintPasswordScreen());
+      case '/forgot-password-new-password':
+        return MaterialPageRoute(builder: (context) => ChangeNewPassword());
       case '/form-kurir':
         return MaterialPageRoute(builder: (context) => FormKurirScreen());
       case '/list-kurir':
         return MaterialPageRoute(builder: (context) => ListKurirScreen());
       case '/pelatihan-form':
         return MaterialPageRoute(builder: (context) => PelatihanFormScreen());
+      case '/pelatihan-detail':
+        var map = {};
+        if (settings.arguments != null) {
+          map = settings.arguments as Map<String, dynamic>;
+        }
+        return MaterialPageRoute(
+            builder: (context) => PelatihanDetailScreen(
+                  id: map['id'],
+                ));
+      case '/order':
+        return MaterialPageRoute(builder: (context) => OrderListScreen());
       case '/article':
         return MaterialPageRoute(builder: (context) => ArticleScreen());
 
@@ -106,9 +137,26 @@ class CustomRouter {
       case '/logout':
         return MaterialPageRoute(builder: (context) => LogoutScreen());
       case '/product-form':
-        return MaterialPageRoute(builder: (context) => ProductFormScreen());
+        var map = {};
+        if (settings.arguments != null) {
+          map = settings.arguments as Map<String, dynamic>;
+        }
+        return MaterialPageRoute(
+            builder: (context) => ProductFormScreen(
+                  id: map['id'],
+                ));
       case '/product':
         return MaterialPageRoute(builder: (context) => ProductListScreen());
+
+      case '/order-detail':
+        var map = {};
+        if (settings.arguments != null) {
+          map = settings.arguments as Map<String, dynamic>;
+        }
+        return MaterialPageRoute(
+            builder: (context) => OrderDetailScreen(
+                  id: map['id'],
+                ));
       default:
         return MaterialPageRoute(
             builder: (context) => Scaffold(

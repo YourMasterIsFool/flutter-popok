@@ -5,7 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:pos_flutter/app.dart';
+import 'package:pos_flutter/commons/CustomSnackbar.dart';
 import 'package:pos_flutter/commons/loading_overflay.dart';
+import 'package:pos_flutter/commons/modal_container.dart';
 import 'package:pos_flutter/commons/wrapper_lost_focus.dart';
 import 'package:pos_flutter/config/style/style.dart';
 import 'package:pos_flutter/config/theme/myTheme.dart';
@@ -28,8 +30,8 @@ class _DonationFormScreenState extends State<DonationFormScreen> {
   final alamatDonasiController = TextEditingController();
   final jumlahDonasiController = TextEditingController();
   final dateDonasiController = TextEditingController();
-  double? latitude;
-  double? longitude;
+  String? latitude;
+  String? longitude;
   String? google_coordinate = '';
 
   DateTime? dateDonasi = null;
@@ -102,7 +104,7 @@ class _DonationFormScreenState extends State<DonationFormScreen> {
             LoadingOverflay.of(context).close();
 
             ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Success Membuat Donasi")));
+                CustomSnackbar().SuccessSnackbar(message: state.success));
 
             navigatorKey.currentState?.pop();
             // navigatorKey.currentState?.pop();
@@ -111,7 +113,7 @@ class _DonationFormScreenState extends State<DonationFormScreen> {
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(
-              title: Text("Buat Donasi ${widget.id}"),
+              title: Text("Buat Donasi "),
             ),
             body: SingleChildScrollView(
               child: Padding(
@@ -123,9 +125,122 @@ class _DonationFormScreenState extends State<DonationFormScreen> {
                     SizedBox(
                       height: verticalPadding / 2,
                     ),
-                    Text(
-                      "Buat Donasi \nPopok",
-                      style: textTheme().titleLarge?.copyWith(fontSize: 24.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Buat Donasi \nPopok",
+                          style:
+                              textTheme().titleLarge?.copyWith(fontSize: 24.0),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            showModalBottomSheet(
+                                context: context,
+                                builder: (context) => ModalContainer(
+                                    title: "Panduan Donasi Popok",
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: horizontalPadding / 2,
+                                          vertical: verticalPadding / 3),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text("1. "),
+                                              SizedBox(
+                                                width: 6.w,
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                    "Popok dibersihkan dari BAB/PUB terlebih dulu"),
+                                              )
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: 8.h,
+                                          ),
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text("2. "),
+                                              SizedBox(
+                                                width: 6.w,
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                    "Isi Gel Di keluarkan dari Kain popok lalu kain direndam dengan air Sabun"),
+                                              )
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: 8.h,
+                                          ),
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text("3. "),
+                                              SizedBox(
+                                                width: 6.w,
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                    "Setelah. Bersih dari Gel, Kain popok dicuci seperti mencuci baju"),
+                                              )
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: 8.h,
+                                          ),
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text("4. "),
+                                              SizedBox(
+                                                width: 6.w,
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                    "setelah dibilas baru Keringkan Di panas Sinar Matahari"),
+                                              )
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: 8.h,
+                                          ),
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text("5. "),
+                                              SizedBox(
+                                                width: 6.w,
+                                              ),
+                                              Expanded(
+                                                child: Text(
+                                                    "Setelah Kering Masukan Ke Kardus dan dibungkus dengan Rapat."),
+                                              )
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    )));
+                          },
+                          child: Text("Panduan"),
+                          style: ButtonStyle(
+                              foregroundColor:
+                                  MaterialStateProperty.all(Colors.black),
+                              backgroundColor: MaterialStateProperty.all(
+                                  Colors.grey.shade200)),
+                        )
+                      ],
                     ),
                     SizedBox(
                       height: verticalPadding,
@@ -205,6 +320,7 @@ class _DonationFormScreenState extends State<DonationFormScreen> {
                             SizedBox(
                               height: 12.h,
                             ),
+
                             Container(
                               width: double.infinity,
                               child: TextButton(
@@ -216,26 +332,18 @@ class _DonationFormScreenState extends State<DonationFormScreen> {
                                           MaterialStateProperty.all(
                                               Colors.grey.shade200)),
                                   onPressed: () async {
-                                    if (latitude != null) {
-                                      String googleUrl =
-                                          'https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}';
-                                      final Uri _url =
-                                          Uri.parse('https://flutter.dev');
-                                      await launchUrl(Uri.parse(googleUrl));
-                                    } else {
-                                      await getLocation().then((value) async {
-                                        setState(() {
-                                          latitude = value.latitude;
-                                          longitude = value.longitude;
-                                        });
-
-                                        // String googleUrl =
-                                        //     'https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}';
-                                        // final Uri _url =
-                                        //     Uri.parse('https://flutter.dev');
-                                        // await launchUrl(Uri.parse(googleUrl));
+                                    await getLocation().then((value) async {
+                                      setState(() {
+                                        latitude = value.latitude.toString();
+                                        longitude = value.longitude.toString();
                                       });
-                                    }
+
+                                      // String googleUrl =
+                                      //     'https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}';
+                                      // final Uri _url =
+                                      //     Uri.parse('https://flutter.dev');
+                                      // await launchUrl(Uri.parse(googleUrl));
+                                    });
                                   },
                                   child: Row(
                                     crossAxisAlignment:
@@ -247,12 +355,31 @@ class _DonationFormScreenState extends State<DonationFormScreen> {
                                         height: 20,
                                       ),
                                       Text(
-                                          "${latitude == null ? 'cari lokasi kamu' : 'buka lokasi kamu di map'}"),
+                                          "${latitude == null ? 'cari lokasi kamu' : 'Update Lokasi'}"),
                                       // Text("${google_coordinate}")
                                     ],
                                   )),
                             ),
-
+                            latitude != null
+                                ? Container(
+                                    margin: EdgeInsets.only(top: 12.h),
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        String googleUrl =
+                                            'https://www.google.com/maps/search/?api=1&query=${latitude ?? ""},${longitude ?? ""}';
+                                        await launchUrl(Uri.parse(googleUrl));
+                                      },
+                                      child: Row(children: [
+                                        Icon(Icons.map),
+                                        SizedBox(
+                                          width: 12.w,
+                                        ),
+                                        Text(
+                                            "Buka Lokasi di map ${latitude} $longitude"),
+                                      ]),
+                                    ),
+                                  )
+                                : Container(),
                             SizedBox(
                               height: verticalPadding / 2,
                             ),

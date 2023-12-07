@@ -10,6 +10,9 @@ class UserModel extends Equatable {
       this.password,
       required this.role_id,
       this.role_name,
+      this.alamat,
+      this.phone_number,
+      this.jenis_kelamin,
       required this.name});
 
   @JsonKey(includeToJson: false)
@@ -19,6 +22,10 @@ class UserModel extends Equatable {
   final String? role_name;
   final String email;
   final String name;
+
+  final String? phone_number;
+  final String? alamat;
+  final String? jenis_kelamin;
 
   final int role_id;
 
@@ -33,6 +40,9 @@ class UserModel extends Equatable {
         this.role_name,
         this.id,
         this.password,
+        this.alamat,
+        this.phone_number,
+        this.jenis_kelamin,
         this.role_id
       ];
 

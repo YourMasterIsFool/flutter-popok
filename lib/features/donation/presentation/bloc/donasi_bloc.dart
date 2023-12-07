@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pos_flutter/features/donation/domain/service/donasi_status_service.dart';
 import 'package:pos_flutter/features/donation/domain/service/donation_service.dart';
 import 'package:pos_flutter/features/donation/model/donasi_model.dart';
 import 'package:pos_flutter/features/donation/presentation/bloc/donasi_state.dart';
@@ -55,5 +56,18 @@ class DonasiBloc extends Cubit<DonasiState> {
       emit(SuccessUpdateStatus());
       getListDonasi();
     }, (r) {});
+  }
+
+  Future<void> deleteDonasiBloc({required int id}) async {
+    emit(LoadingDeleteDonasi());
+
+    var response = await donationService.delete_donasi_service(id: id);
+
+    response?.fold((l) {
+      emit(SuccessDeleteDonasi(l));
+      getListDonasi();
+    }, (r) {
+      print(r?.response.toString());
+    });
   }
 }

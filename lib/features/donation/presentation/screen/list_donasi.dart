@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttericon/font_awesome_icons.dart';
 import 'package:pos_flutter/app.dart';
+import 'package:pos_flutter/commons/CustomSnackbar.dart';
 import 'package:pos_flutter/commons/loading_overflay.dart';
 import 'package:pos_flutter/commons/modal_container.dart';
 import 'package:pos_flutter/config/secure_storage/secure_storage.dart';
@@ -12,6 +13,8 @@ import 'package:pos_flutter/config/theme/myTheme.dart';
 import 'package:pos_flutter/features/donation/model/donasi_model.dart';
 import 'package:pos_flutter/features/donation/presentation/bloc/donasi_bloc.dart';
 import 'package:pos_flutter/features/donation/presentation/bloc/donasi_state.dart';
+import 'package:pos_flutter/features/donation/presentation/bloc/donasi_status_bloc.dart';
+import 'package:pos_flutter/features/donation/presentation/bloc/donasi_status_state.dart';
 import 'package:pos_flutter/utils/formattingDate.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -24,6 +27,10 @@ class ListDonasiScreen extends StatefulWidget {
 
 class _ListDonasiScreenState extends State<ListDonasiScreen> {
   late DonasiBloc _donasiBloc;
+  late DonasiStatusBloc _donasiStatusBloc;
+
+  final donasi_code = TextEditingController();
+
   bool canCreate = false;
   String role_name = '';
 
@@ -31,12 +38,26 @@ class _ListDonasiScreenState extends State<ListDonasiScreen> {
   @override
   void initState() {
     _donasiBloc = context.read<DonasiBloc>();
+    _donasiStatusBloc = context.read<DonasiStatusBloc>();
+    _donasiStatusBloc.getDonasiStatusListBloc();
+
     _donasiBloc.getListDonasi();
     super.initState();
+
+    donasi_code.addListener(() {
+      _donasiBloc
+          .getListDonasi(params: {'status': int.parse(donasi_code.text)});
+    });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       canCreateHandler();
     });
+  }
+
+  @override
+  void dispose() {
+    donasi_code.dispose();
+    super.dispose();
   }
 
   canCreateHandler() async {
@@ -85,9 +106,9 @@ class _ListDonasiScreenState extends State<ListDonasiScreen> {
     // String? role_name = '',
   }) async {
     await showModalBottomSheet(
-        context: _scaffoldKey.currentState!.context,
+        context: context,
         builder: (context) => ModalContainer(
-            title: "Action ${donasi_id}",
+            title: "Action ",
             child: StatefulBuilder(
               builder: (context, setState) {
                 return Column(
@@ -143,7 +164,10 @@ class _ListDonasiScreenState extends State<ListDonasiScreen> {
                                                         MaterialState.pressed)
                                                     ? Colors.grey.shade200
                                                     : Colors.transparent))),
-                                    onPressed: () {},
+                                    onPressed: () async {
+                                      await _donasiBloc.updateStatusDonasi(
+                                          donasi_id, 3);
+                                    },
                                     child: Row(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
@@ -160,7 +184,7 @@ class _ListDonasiScreenState extends State<ListDonasiScreen> {
                             ],
                           )
                         : Container(),
-                    role_name == 'user'
+                    role_name == 'user' && status == 0
                         ? Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -192,6 +216,44 @@ class _ListDonasiScreenState extends State<ListDonasiScreen> {
                                           width: 8.w,
                                         ),
                                         Text("Edit")
+                                      ],
+                                    )),
+                              ),
+                              Container(
+                                width: double.infinity,
+                                child: TextButton(
+                                    style: ButtonStyle(
+                                        foregroundColor:
+                                            MaterialStateProperty.all(
+                                                Colors.black),
+                                        backgroundColor:
+                                            MaterialStateProperty.resolveWith(
+                                                (states) => (states.contains(
+                                                        MaterialState.pressed)
+                                                    ? Colors.grey.shade200
+                                                    : Colors.transparent))),
+                                    onPressed: () async {
+                                      await _donasiBloc.deleteDonasiBloc(
+                                          id: donasi_id);
+                                    },
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          FontAwesome.trash,
+                                          color: errorColor,
+                                        ),
+                                        SizedBox(
+                                          width: 8.w,
+                                        ),
+                                        Text(
+                                          "Hapus Donasi",
+                                          style: textTheme()
+                                              .bodyMedium
+                                              ?.copyWith(
+                                                  color: Colors.red.shade600),
+                                        )
                                       ],
                                     )),
                               ),
@@ -236,7 +298,7 @@ class _ListDonasiScreenState extends State<ListDonasiScreen> {
                                               SizedBox(
                                                 width: 8.w,
                                               ),
-                                              Text("sedang diambil kurir")
+                                              Text("Kurir menuju ke lokasi")
                                             ],
                                           )),
                                     )
@@ -294,75 +356,160 @@ class _ListDonasiScreenState extends State<ListDonasiScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<DonasiBloc, DonasiState>(
-      bloc: _donasiBloc,
-      buildWhen: (prev, next) {
-        return (next is SuccessGetListDonasi);
-      },
-      listener: (context, state) {
-        // TODO: implement listener
-        if (state is LoadingUpdateStatus) {
-          LoadingOverflay.of(context).open();
-        } else if (state is SuccessUpdateStatus) {
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text("Success update status")));
-          LoadingOverflay.of(context).close();
-        }
-      },
-      builder: (context, state) {
-        if (state is LoadingDonasiState) {
-          return Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Donasi Popok"),
+        actions: [
+          canCreate
+              ? IconButton(
+                  onPressed: () {
+                    navigatorKey.currentState?.pushNamed('/form-donate');
+                  },
+                  icon: Icon(Icons.add))
+              : Container()
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: 24.h,
             ),
-          );
-        }
-
-        if (state is SuccessGetListDonasi) {
-          return Scaffold(
-            key: _scaffoldKey,
-            appBar: AppBar(
-              title: Text("Donasi $role_name"),
-              actions: [
-                canCreate
-                    ? IconButton(
-                        onPressed: () {
-                          navigatorKey.currentState?.pushNamed('/form-donate');
-                        },
-                        icon: Icon(Icons.add))
-                    : Container()
-              ],
-            ),
-            body: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Donasi Kamu",
-                      style: textTheme().titleLarge,
-                    ),
-                    SizedBox(
-                      height: verticalPadding / 2,
-                    ),
-                    ListView.builder(
-                      itemBuilder: (context, index) =>
-                          donasiCard(donasiModel: state.listDonasi[index]),
-                      itemCount: state.listDonasi.length,
-                      primary: false,
-                      shrinkWrap: true,
-                    )
-                  ],
-                ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding / 2),
+              child: Text(
+                "Donasi",
+                style: textTheme().titleLarge,
               ),
             ),
-          );
-        }
+            SizedBox(
+              height: 12.h,
+            ),
+            BlocConsumer<DonasiStatusBloc, DonasiStatusState>(
+                bloc: _donasiStatusBloc,
+                builder: (context, listDonasiState) {
+                  if (listDonasiState is LoadingGetDonasiStatus) {
+                    return Container(
+                      width: 30,
+                      height: 30,
+                      child: CircularProgressIndicator(),
+                    );
+                  }
 
-        return Scaffold();
-      },
+                  if (listDonasiState is SuccessGetDonasiStatus) {
+                    return Container(
+                      height: 48,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            margin: EdgeInsets.only(left: 12.w),
+                            child: TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  donasi_code.text = listDonasiState
+                                      .listDonasiStatus[index].code
+                                      .toString();
+                                });
+                              },
+                              style: ButtonStyle(
+                                foregroundColor: MaterialStateProperty.all(
+                                    listDonasiState.listDonasiStatus[index].code
+                                                .toString() ==
+                                            donasi_code.text
+                                        ? Colors.white
+                                        : Colors.black),
+                                shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        side: BorderSide(
+                                            color: Colors.grey.shade400))),
+                                backgroundColor: MaterialStateProperty.all(
+                                    listDonasiState.listDonasiStatus[index].code
+                                                .toString() ==
+                                            donasi_code.text
+                                        ? primaryColor
+                                        : Colors.transparent),
+                              ),
+                              child: Text(
+                                  "${listDonasiState.listDonasiStatus[index].status}"),
+                            ),
+                          );
+                        },
+                        itemCount: listDonasiState.listDonasiStatus.length,
+                      ),
+                    );
+                  }
+                  return Container();
+                },
+                listener: (context, state) {}),
+            BlocConsumer<DonasiBloc, DonasiState>(
+              bloc: _donasiBloc,
+              buildWhen: (prev, next) {
+                return (next is SuccessGetListDonasi ||
+                    next is LoadingDonasiState);
+              },
+              listener: (context, state) {
+                // TODO: implement listener
+
+                if (state is LoadingDeleteDonasi) {
+                  LoadingOverflay.of(context).open();
+                }
+
+                if (state is SuccessDeleteDonasi) {
+                  LoadingOverflay.of(context).close();
+                  ScaffoldMessenger.of(context).showSnackBar(CustomSnackbar()
+                      .SuccessSnackbar(message: "${state.success}"));
+                  Navigator.pop(context);
+                }
+                if (state is LoadingUpdateStatus) {
+                  LoadingOverflay.of(context).open();
+                } else if (state is SuccessUpdateStatus) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Success update status")));
+                  LoadingOverflay.of(context).close();
+                }
+              },
+              builder: (context, state) {
+                if (state is LoadingDonasiState) {
+                  return Center(
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+
+                if (state is SuccessGetListDonasi) {
+                  return Padding(
+                    padding: EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: verticalPadding / 2,
+                        ),
+                        ListView.builder(
+                          itemBuilder: (context, index) =>
+                              donasiCard(donasiModel: state.listDonasi[index]),
+                          itemCount: state.listDonasi.length,
+                          primary: false,
+                          shrinkWrap: true,
+                        )
+                      ],
+                    ),
+                  );
+                }
+
+                return Scaffold();
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -510,7 +657,7 @@ class _ListDonasiScreenState extends State<ListDonasiScreen> {
                       height: 20,
                     ),
                     Text(
-                      'buka lokasi di map',
+                      'buka lokasi di map ${donasiModel?.latitude} ${donasiModel?.longitude}',
                     )
                     // Text("${google_coordinate}")
                   ],

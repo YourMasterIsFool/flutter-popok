@@ -76,4 +76,16 @@ class UserService {
       }
     }
   }
+
+  Future<Either<UserModel, DioException?>?> get_user_admin() async {
+    try {
+      var response = await client.get("/user/get_user_admin");
+
+      return left(UserModel.fromJson(response.data['data']));
+    } catch (e) {
+      if (e is DioException) {
+        return right(e);
+      }
+    }
+  }
 }

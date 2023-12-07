@@ -38,7 +38,7 @@ class LoadingGetListProduct extends ProductState {
 
 class SuccessGetDetailProduct extends ProductState {
   final ProductModel product;
-  const SuccessGetDetailProduct(this.product);
+  const SuccessGetDetailProduct(this.product) : super(product: product);
 }
 
 class LoadingGetDetailProduct extends ProductState {

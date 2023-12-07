@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_flutter/app.dart';
+import 'package:pos_flutter/commons/CustomSnackbar.dart';
 import 'package:pos_flutter/commons/date_input.dart';
 import 'package:pos_flutter/commons/loading_overflay.dart';
 import 'package:pos_flutter/commons/wrapper_lost_focus.dart';
@@ -55,8 +56,8 @@ class _PelatihanFormScreenState extends State<PelatihanFormScreen> {
       listener: (context, state) {
         if (state is SuccessCreatePelatihan) {
           navigatorKey.currentState?.pop();
-          ScaffoldMessenger.of(context)
-              .showSnackBar(new SnackBar(content: Text("${state.success}")));
+          ScaffoldMessenger.of(context).showSnackBar(CustomSnackbar()
+              .SuccessSnackbar(message: "Success create pelatihan"));
         }
 
         print(state);
@@ -66,7 +67,7 @@ class _PelatihanFormScreenState extends State<PelatihanFormScreen> {
         return WrapperLostFocuse(
           child: Scaffold(
             appBar: AppBar(
-              title: Text("Create Pelatihan"),
+              title: Text("Buat Pelatihan"),
             ),
             body: SingleChildScrollView(
               child: Padding(

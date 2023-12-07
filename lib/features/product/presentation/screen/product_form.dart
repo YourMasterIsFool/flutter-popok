@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pos_flutter/app.dart';
 import 'package:pos_flutter/commons/loading_overflay.dart';
@@ -16,7 +17,8 @@ import 'package:pos_flutter/features/product/presentation/bloc/product_state.dar
 import 'package:pos_flutter/utils/get_base_64_formatted_file.dart';
 
 class ProductFormScreen extends StatefulWidget {
-  const ProductFormScreen({super.key});
+  const ProductFormScreen({super.key, this.id});
+  final int? id;
 
   @override
   State<ProductFormScreen> createState() => _ProductFormScreenState();
@@ -28,18 +30,39 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
   PlatformFile? file;
 
   LoadingOverflay? loadingOverflay;
+  final product_title = TextEditingController();
+  final product_description = TextEditingController();
+  final product_price = TextEditingController();
   late ProductBloc _productBloc;
 
   @override
   void initState() {
     _productBloc = context.read<ProductBloc>();
     loadingOverflay = LoadingOverflay.of(context);
+
+    if (widget.id != null) {
+      getDetailData();
+    }
     super.initState();
   }
 
-  final product_title = TextEditingController();
-  final product_description = TextEditingController();
-  final product_price = TextEditingController();
+  @override
+  void dispose() {
+    product_description.dispose();
+    product_title.dispose();
+    product_price.dispose();
+    super.dispose();
+  }
+
+  void getDetailData() async {
+    await _productBloc.getProductDetail(widget.id ?? 0);
+    product_description.text =
+        _productBloc.state.product?.product_description ?? '';
+    product_price.text =
+        _productBloc.state.product?.product_price.toString() ?? '';
+
+    product_title.text = _productBloc.state.product?.product_title ?? '';
+  }
 
   Future<void> uploadGambar() async {
     filePicker = await FilePicker.platform.pickFiles();
@@ -83,6 +106,14 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
             navigatorKey.currentState!.pop();
           }
 
+          // if (state is LoadingGetDetailProduct) {
+          //     loadingOverflay?.open();
+          //   }
+
+          //   if (state is SuccessGetDetailProduct) {
+          //     loadingOverflay?.close();
+          //   }
+
           // if (state is SuccessCreateProduct) {
 
           // }
@@ -90,7 +121,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(
-              title: Text("Tambah Product"),
+              title: Text(
+                  "${widget.id == null ? 'Tambah Product' : 'Update Product'}"),
             ),
             body: SingleChildScrollView(
               child: Padding(
@@ -175,21 +207,27 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                                 await uploadGambar();
                               },
                               child: Container(
-                                child: file == null
-                                    ? Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Text("Upload gambar"),
-                                          SizedBox(
-                                            height: 2.h,
+                                child: file != null
+                                    ? Image.file(File(file?.path ?? ''))
+                                    : state.product?.file_path != null
+                                        ? Image.network(
+                                            '${dotenv.env["BASE_URL_API"]}${state.product?.file_path}',
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                          )
+                                        : Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Text("Upload gambar"),
+                                              SizedBox(
+                                                height: 2.h,
+                                              ),
+                                              Icon(Icons.add_a_photo)
+                                            ],
                                           ),
-                                          Icon(Icons.add_a_photo)
-                                        ],
-                                      )
-                                    : Image.file(File(file?.path ?? '')),
                                 decoration: BoxDecoration(
                                     color: Colors.grey.shade200,
                                     borderRadius: BorderRadius.circular(10)),
@@ -212,7 +250,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text("Tambah product"),
+                                    Text(
+                                        "${widget.id == null ? 'Tambah product' : 'Edit Product'}"),
                                     SizedBox(
                                       width: horizontalPadding / 3,
                                     ),

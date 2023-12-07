@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:pos_flutter/features/donation/model/donasi_model.dart';
+import 'package:pos_flutter/features/donation/model/donasi_status_model.dart';
 
 abstract class DonasiState extends Equatable {
   final DonasiModel? donasiModel;
@@ -51,3 +52,27 @@ class SuccessUpdateStatus extends DonasiState {
 
   SuccessUpdateStatus();
 }
+
+class LoadingDeleteDonasi extends DonasiState {
+  const LoadingDeleteDonasi();
+}
+
+class SuccessDeleteDonasi extends DonasiState {
+  // final DonasiModel donasi;
+  final String success;
+  SuccessDeleteDonasi(this.success);
+}
+
+
+
+// class LoadingGetDonasiStatus extends DonasiState {
+//   const LoadingGetDonasiStatus();
+// }
+
+// class SuccessGetListDonasiStatus extends DonasiState {
+//   // final DonasiModel donasi;
+
+//   final List<DonasiStatusModel> listStatus;
+
+//   const SuccessGetListDonasiStatus(this.listStatus);
+// }

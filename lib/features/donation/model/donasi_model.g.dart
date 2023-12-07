@@ -9,8 +9,8 @@ part of 'donasi_model.dart';
 DonasiModel _$DonasiModelFromJson(Map<String, dynamic> json) => DonasiModel(
       id: json['id'] as int?,
       status_id: json['status_id'] as int?,
-      longitude: (json['longitude'] as num?)?.toDouble(),
-      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: json['longitude'] as String?,
+      latitude: json['latitude'] as String?,
       status_donasi: json['status_donasi'] as String?,
       alamat_donasi: json['alamat_donasi'] as String?,
       jumlah_donasi: (json['jumlah_donasi'] as num).toDouble(),

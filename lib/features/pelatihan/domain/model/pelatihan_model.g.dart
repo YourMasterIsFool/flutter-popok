@@ -9,8 +9,14 @@ part of 'pelatihan_model.dart';
 PelatihanModel _$PelatihanModelFromJson(Map<String, dynamic> json) =>
     PelatihanModel(
       id: json['id'] as int?,
+      is_member: json['is_member'] == null
+          ? null
+          : PelatihanMember.fromJson(json['is_member'] as Map<String, dynamic>),
       judul_pelatihan: json['judul_pelatihan'] as String,
       deskripsi: json['deskripsi'] as String,
+      members: (json['members'] as List<dynamic>?)
+          ?.map((e) => PelatihanMember.fromJson(e as Map<String, dynamic>))
+          .toList(),
       lokasi_pelatihan: json['lokasi_pelatihan'] as String,
       tanggal_pelatihan: json['tanggal_pelatihan'] == null
           ? null

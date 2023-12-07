@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:pos_flutter/app.dart';
+import 'package:pos_flutter/config/secure_storage/secure_storage.dart';
 import 'package:pos_flutter/config/style/style.dart';
 import 'package:pos_flutter/config/theme/myTheme.dart';
 import 'package:pos_flutter/features/product/presentation/bloc/product_bloc.dart';
@@ -46,13 +48,23 @@ class _ProductListScreenState extends State<ProductListScreen> {
         if (state is SuccessGetListProduct) {
           return Scaffold(
             appBar: AppBar(
-              title: Text("Product "),
+              title: Text("Produk"),
               actions: [
-                IconButton(
-                    onPressed: () {
-                      navigatorKey.currentState?.pushNamed('/product-form');
-                    },
-                    icon: Icon(Icons.add))
+                FutureBuilder(
+                    future: SecureStorage().getRole(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return snapshot.data == 'admin'
+                            ? IconButton(
+                                onPressed: () {
+                                  navigatorKey.currentState
+                                      ?.pushNamed('/product-form');
+                                },
+                                icon: Icon(Icons.add))
+                            : Container();
+                      }
+                      return Container();
+                    })
               ],
             ),
             body: SingleChildScrollView(
@@ -63,12 +75,31 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     SizedBox(
                       height: verticalPadding / 2,
                     ),
-                    GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 8 / 13,
-                          mainAxisSpacing: 16,
-                          crossAxisSpacing: 8),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.asset(
+                        'assets/images/popok_product.jpg',
+                        width: double.infinity,
+                        height: 150,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    // Container(
+                    //   height: 150,
+                    //   width: double.infinity,
+                    //   decoration: BoxDecoration(
+                    //       borderRadius: BorderRadius.circular(10),
+                    //       color: Colors.grey.shade400),
+                    // ),
+                    SizedBox(
+                      height: verticalPadding / 2,
+                    ),
+                    MasonryGridView.builder(
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      gridDelegate:
+                          SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2),
                       itemBuilder: (context, index) =>
                           ProductWidget(productModel: state.products[index]),
                       itemCount: state.products.length,

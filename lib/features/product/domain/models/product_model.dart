@@ -13,19 +13,19 @@ class ProductModel extends Equatable {
 
   final String product_description;
   final double product_price;
-
+  final int? stok;
   // @JsonKey(includeToJson: false, includeFromJson: false)
   // final File? product_file;
 
   final String? file_path;
 
-  ProductModel({
-    required this.product_title,
-    required this.product_description,
-    required this.product_price,
-    this.id,
-    this.file_path,
-  });
+  ProductModel(
+      {required this.product_title,
+      required this.product_description,
+      required this.product_price,
+      this.id,
+      this.file_path,
+      this.stok});
 
   @override
   // TODO: implement props
@@ -35,6 +35,7 @@ class ProductModel extends Equatable {
         this.product_price,
         this.id,
         this.file_path,
+        this.stok
       ];
 
   Map<String, dynamic> toJson() => _$ProductModelToJson(this);
